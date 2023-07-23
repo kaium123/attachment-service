@@ -1,0 +1,45 @@
+syntax="proto3";
+
+package attachment;
+
+option go_package="pb/";
+import "google/protobuf/empty.proto";
+
+
+message RequestAttachment {
+    string path = 1;
+    string name = 2;
+}
+
+message ResponseAttachment {
+    string path = 1;
+    string name = 2;
+    uint64 id = 3;
+}
+
+message ResponseAttachments {
+    repeated ResponseAttachment Attachments = 1;
+}
+
+message RequestAttachments {
+   repeated RequestAttachment Attachments = 1;
+}
+
+message FindOneRequest { 
+    int64 id = 1;
+}
+
+message AttachmentIDs { 
+    repeated int64 id = 1;
+}
+
+message DeleteResponse { 
+    string response = 1;
+}
+
+service AttachmentService {
+    rpc CreateMultiple(RequestAttachments) returns (ResponseAttachments){} 
+    rpc FetchSingle(FindOneRequest) returns (ResponseAttachment){}
+    rpc FetchAll(google.protobuf.Empty) returns (ResponseAttachments){}
+    rpc Delete(AttachmentIDs) returns (DeleteResponse){}
+}

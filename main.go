@@ -43,13 +43,6 @@ func readConfig() {
 	}
 }
 
-// func Migration() {
-// 	db := db.NewGormDb()
-// 	db.AutoMigrate(postModels.Post{})
-// 	db.AutoMigrate(reactModels.React{})
-// 	db.AutoMigrate(commentModels.Comment{})
-// }
-
 func checkDb() {
 	db := localDb.NewEntDb()
 	_, err := db.ExecContext(context.Background(), "select 1")

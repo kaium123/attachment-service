@@ -3,9 +3,13 @@ package command
 import (
 	"fmt"
 	"log"
-	"net/http"
+	"net"
 	"newsfeed/common/logger"
-	"newsfeed/route"
+	"newsfeed/controller"
+	"newsfeed/db"
+	"newsfeed/file_uploader"
+	"newsfeed/pb"
+	"newsfeed/service"
 	"os"
 	"os/signal"
 	"syscall"
@@ -13,7 +17,7 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
-	"golang.org/x/net/context"
+	"google.golang.org/grpc"
 )
 
 func init() {
@@ -29,21 +33,30 @@ var serverCmd = &cobra.Command{
 	Use:   "server",
 	Short: "Run server",
 	Run: func(cmd *cobra.Command, args []string) {
-		router := route.Setup()
-		port := viper.GetString("SERVER_PORT")
-
-		logger.LogInfo("Running server on port: " + port)
-
-		server := &http.Server{
-			Addr:    ":" + port,
-			Handler: router,
+		lis, err := net.Listen("tcp", ":8070")
+		if err != nil {
+			log.Fatalf("failed to listen: %v", err)
 		}
-	
-		go func() {
-			if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-				log.Fatalf("listen: %s\n", err)
-			}
-		}()
+		defer lis.Close()
+
+		grpcServer := grpc.NewServer()
+
+		//gRPCClient:=grpc.Dial()
+
+		entClient := db.NewEntDb()
+		FileInterface := file_uploader.NewFileUploaderFactory()
+		svc := service.NewAttachmentService(entClient, FileInterface)
+
+		server := controller.AttachmentServer{
+			Svc: svc,
+		}
+
+		//service.NewAttachmentService(entClient, uploader fileUploader.FileUploaderInterface)
+
+		pb.RegisterAttachmentServiceServer(grpcServer, server)
+		if err := grpcServer.Serve(lis); err != nil {
+			log.Fatalln("Failed to serve:", err)
+		}
 
 		quit := make(chan os.Signal)
 		signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
@@ -51,12 +64,6 @@ var serverCmd = &cobra.Command{
 		logger.LogInfo("Shutting down server...")
 
 		//shutdown gin
-		serverCloseContext, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
-		fmt.Println("getting ready for pettycash server shutdown")
-		if err := server.Shutdown(serverCloseContext); err != nil {
-			log.Fatal("Server Shutdown err:", err)
-		}
 
 		time.Sleep(time.Millisecond * 100)
 		fmt.Println("bye bye")
