@@ -1,0 +1,30 @@
+version: '3.5'
+
+services:
+  attachment_db:
+    container_name: attachment_db
+    image: postgres
+    ports:
+      - "54321:5432"
+    volumes:
+      - attachment_db:/var/lib/postgresql
+    environment:
+      POSTGRES_DB: attachment
+      POSTGRES_PASSWORD: attachment_54321
+    networks:
+      - attachment_network
+    restart: unless-stopped
+
+
+ 
+  
+
+
+networks:
+  attachment_network:
+    driver: bridge
+
+volumes:
+  attachment_db: {}
+  # minio_storage: {}
+

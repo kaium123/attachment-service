@@ -4,7 +4,6 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
-	"newsfeed/common/utils"
 
 	validation "github.com/go-ozzo/ozzo-validation/v4"
 )
@@ -199,7 +198,7 @@ func (e *ApplicationError) Unwrap() []ApplicationError {
 }
 
 func (e ApplicationError) Error() string {
-	return utils.Trans(e.TranslationKey, e.TranslationParams)
+	return e.TranslationKey
 }
 
 func (e ApplicationError) Code() string {
@@ -229,7 +228,7 @@ type GinError struct{}
 func GetErrorMessage(err error) string {
 	aError := ApplicationError{}
 	if errors.As(err, &aError) {
-		return utils.Trans(aError.TranslationKey, aError.TranslationParams)
+		return aError.TranslationKey
 	}
 	return fmt.Sprint(err)
 }

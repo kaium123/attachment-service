@@ -1,12 +1,11 @@
 package file_uploader
 
 import (
+	"attachment/common/logger"
 	"bytes"
 	"io"
 	"mime/multipart"
 	"net/http"
-
-	"newsfeed/common/logger"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/credentials"

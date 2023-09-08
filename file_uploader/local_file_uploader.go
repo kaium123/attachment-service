@@ -6,8 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"newsfeed/common/utils"
-
 	"github.com/gin-gonic/gin"
 )
 
@@ -38,7 +36,7 @@ func (f LocalFileUploader) UploadSingleFile(directory, filename string, fileHead
 
 func (f LocalFileUploader) GetSingleFile(context *gin.Context, filePath string, fileName string) {
 	if _, err := os.Stat(filePath); os.IsNotExist(err) {
-		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": utils.Trans("fileNotFound", nil), "status": "error"})
+		context.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "fileNotFound"})
 		return
 	}
 	context.Header("X-File-Name", fileName)

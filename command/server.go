@@ -1,15 +1,15 @@
 package command
 
 import (
+	"attachment/common/logger"
+	"attachment/controller"
+	"attachment/db"
+	"attachment/file_uploader"
+	"attachment/pb"
+	"attachment/service"
 	"fmt"
 	"log"
 	"net"
-	"newsfeed/common/logger"
-	"newsfeed/controller"
-	"newsfeed/db"
-	"newsfeed/file_uploader"
-	"newsfeed/pb"
-	"newsfeed/service"
 	"os"
 	"os/signal"
 	"syscall"
@@ -43,15 +43,16 @@ var serverCmd = &cobra.Command{
 
 		//gRPCClient:=grpc.Dial()
 
-		entClient := db.NewEntDb()
+		db := db.InitDB()
 		FileInterface := file_uploader.NewFileUploaderFactory()
-		svc := service.NewAttachmentService(entClient, FileInterface)
+		svc := service.NewAttachmentService(db, FileInterface)
 
 		server := controller.AttachmentServer{
 			Svc: svc,
 		}
 
 		//service.NewAttachmentService(entClient, uploader fileUploader.FileUploaderInterface)
+		fmt.Println("server is listening on ", "8070")
 
 		pb.RegisterAttachmentServiceServer(grpcServer, server)
 		if err := grpcServer.Serve(lis); err != nil {

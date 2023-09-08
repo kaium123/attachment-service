@@ -1,11 +1,10 @@
 package controller
 
 import (
+	"attachment/pb"
+	"attachment/service"
 	"context"
-	"newsfeed/pb"
-	"newsfeed/service"
 
-	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -23,14 +22,14 @@ func (a AttachmentServer) CreateMultiple(ctx context.Context, req *pb.RequestAtt
 	return a.Svc.UploadAttachments(req)
 }
 
-func (a AttachmentServer) FetchSingle(ctx context.Context, req *pb.FindOneRequest) (*pb.ResponseAttachment, error) {
+func (a AttachmentServer) FetchSingle(ctx context.Context, req *pb.FindOneRequestParams) (*pb.ResponseAttachment, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method FetchSingle not implemented")
 }
 
-func (a AttachmentServer) FetchAll(ctx context.Context, req *empty.Empty) (*pb.ResponseAttachments, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method FetchAll not implemented")
+func (a AttachmentServer) FetchAll(ctx context.Context, req *pb.FindAllRequestParams) (*pb.ResponseAttachments, error) {
+	return a.Svc.FetchAll(req.SourceType, req.SourceId)
 }
 
 func (a AttachmentServer) Delete(ctx context.Context, req *pb.AttachmentIDs) (*pb.DeleteResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Delete not implemented")
+	return a.Svc.Delete(req)
 }

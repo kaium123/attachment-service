@@ -1,12 +1,9 @@
 package main
 
 import (
-	"context"
-	"newsfeed/command"
-	"newsfeed/common/logger"
-	"newsfeed/config"
-	localDb "newsfeed/db"
-
+	"attachment/command"
+	"attachment/common/logger"
+	"attachment/config"
 	"fmt"
 	"os"
 
@@ -40,14 +37,6 @@ func readConfig() {
 	err = viper.Unmarshal(&config.Config)
 	for _, key := range viper.AllKeys() {
 		viper.BindEnv(key)
-	}
-}
-
-func checkDb() {
-	db := localDb.NewEntDb()
-	_, err := db.ExecContext(context.Background(), "select 1")
-	if err != nil {
-		panic(fmt.Errorf("error connecting to db: %w", err))
 	}
 }
 
