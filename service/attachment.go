@@ -34,21 +34,21 @@ func NewAttachmentService(Db *sql.DB, uploader fileUploader.FileUploaderInterfac
 }
 
 func (aus AttachmentUploaderService) Delete(req *pb.AttachmentIDs) (*pb.DeleteResponse, error) {
-    query := "DELETE FROM attachments WHERE sourceId = $1 AND sourceType = $2"
-	logger.LogError(req.SourceId," ",req.SourceType)
+	query := "DELETE FROM attachments WHERE sourceId = $1 AND sourceType = $2"
+	logger.LogError(req.SourceId, " ", req.SourceType)
 
-    result, err := aus.Db.Exec(query, req.SourceId, req.SourceType)
-    if err != nil {
+	result, err := aus.Db.Exec(query, req.SourceId, req.SourceType)
+	if err != nil {
 		logger.LogError(err)
-        return nil,err
-    }
+		return nil, err
+	}
 
-    rows, err := result.RowsAffected()
+	rows, err := result.RowsAffected()
 	logger.LogError(rows)
-    if err != nil {
-        return nil,err
-    }
-	return &pb.DeleteResponse{},nil
+	if err != nil {
+		return nil, err
+	}
+	return &pb.DeleteResponse{}, nil
 }
 
 func (aus AttachmentUploaderService) GetSingleAttachment(context *gin.Context, attachmentPath string) {
@@ -90,7 +90,7 @@ func getLastInsertedIDs(tx *sql.Tx) ([]int64, error) {
 func (aus AttachmentUploaderService) FetchAll(sourceType string, sourceID int64) (*pb.ResponseAttachments, error) {
 	// SQL query with placeholders
 	query := `
-	 SELECT name, path
+	 SELECT name, path 
 	 FROM attachments
 	 WHERE sourceId = $1 AND sourceType = $2
  `
@@ -118,6 +118,7 @@ func (aus AttachmentUploaderService) FetchAll(sourceType string, sourceID int64)
 	for _, attachment := range attachments {
 		tmpAttachment := &pb.ResponseAttachment{}
 		utils.CopyStructToStruct(attachment, tmpAttachment)
+		tmpAttachment.SourceId = uint64(sourceID)
 		pbResponse.Attachments = append(pbResponse.Attachments, tmpAttachment)
 	}
 
